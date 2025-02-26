@@ -408,7 +408,7 @@ def getflow_tum(model, sigma=0.05, cfg=None):
     print('hws:', hws)
     weights = compute_weight(hws, IMAGE_SIZE, TRAIN_SIZE, sigma)
     model.eval()
-    val_dataset = datasets.TUM(split='testing')
+    val_dataset = datasets.TUM(split='testing', root=os.path.join('/root/data1/tum_dataset/', cfg.sub_name))
 
     out_list, epe_list = [], []
     for val_id in range(len(val_dataset)):
@@ -431,9 +431,13 @@ def getflow_tum(model, sigma=0.05, cfg=None):
         flow_pre = inference_with_tile(model, image1, image2, hws, weights, TRAIN_SIZE, IMAGE_SIZE, padder=padder)
 
         flow = flow_pre[0].cpu()
+
+        if not os.path.exists(os.path.join(cfg.save_path, cfg.sub_name)):
+            os.makedirs(os.path.join(cfg.save_path, cfg.sub_name))
+        
         # out_picture(flow, os.path.join(cfg.save_path, frame_id[0]))
         # out_linepic(image1[0].cpu(), image2[0].cpu(), flow, os.path.join(cfg.save_path, frame_id[0]))
-        out_flow(flow, os.path.join(cfg.save_path, frame_id[0]).replace('.png', '.npy'))
+        out_flow(flow, os.path.join(cfg.save_path, cfg.sub_name,frame_id[0]).replace('.png', '.npy'))
 
 import pytorch_lightning as pl
 
@@ -451,20 +455,21 @@ if __name__ == '__main__':
     # parser.add_argument('--model_path', help='ckpt path')
     parser.add_argument('--eval', help='eval benchmark: sintel_validation | kitti_validation | sintel_submission | kitti_submission | kitti_getflow | tum_getflow')
     parser.add_argument('--save_path', type=str)
+    parser.add_argument('--sub_name', type=str)
     args = parser.parse_args()
 
     if args.model_type == 'SAMFlow-H':
         from configs.SAMFlow_H import get_cfg
-        args.model_path = 'weights/SAMFlow-H.ckpt'
+        args.model_path = '../weights/SAMFlow-H.ckpt'
     elif args.model_type == 'SAMFlow-H-ft':
         from configs.SAMFlow_H_ft import get_cfg
-        args.model_path = 'weights/SAMFlow-H-sintel.ckpt'
+        args.model_path = '../weights/SAMFlow-H-sintel.ckpt'
     elif args.model_type == 'SAMFlow-B':
         from configs.SAMFlow_B import get_cfg
-        args.model_path = 'weights/SAMFlow-B.ckpt'
+        args.model_path = '../weights/SAMFlow-B.ckpt'
     elif args.model_type == 'SAMFlow-tiny':
         from configs.SAMFlow_tiny import get_cfg
-        args.model_path = 'weights/SAMFlow-tiny.ckpt'
+        args.model_path = '../weights/SAMFlow-tiny.ckpt'
     # elif args.model_type == 'SAMFlow-B':
     #     from configs.things_prompt_submission_basescale import get_cfg
     # elif args.model_type == 'SAMFlow-tiny':

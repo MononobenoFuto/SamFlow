@@ -429,7 +429,7 @@ class KITTI_RAW_GT(FlowDataset):
 
 
 class TUM(FlowDataset):
-    def __init__(self, aug_params=None, split='training', root='/root/data1/rgbd_dataset_freiburg3_walking_xyz'):
+    def __init__(self, aug_params=None, split='training', root='/root/data1/tum_dataset/rgbd_dataset_freiburg3_walking_xyz'):
         super(TUM, self).__init__(aug_params, sparse=True)
         if split == 'testing':
             self.is_test = True
